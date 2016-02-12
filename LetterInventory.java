@@ -21,7 +21,7 @@ public class LetterInventory {
 	}
 
 	public LetterInventory(String data) {
-		this.inventory = addData(data);
+		inventory = addData(data);
 	}
 
 
@@ -112,18 +112,18 @@ public class LetterInventory {
 			newCount = value;
 			// If increasing
 			if (value >= currentCount) {
-				this.numberOfChars = numberOfChars + value;
+				numberOfChars = numberOfChars + value;
 			}
 			//If decreasing count
 			else if (value < currentCount) {
 				int difference = currentCount - value;
-				this.numberOfChars = numberOfChars - difference;
+				numberOfChars = numberOfChars - difference;
 			}
 		}
 		// if this is the characters first time appearing make a new entry and set the newCount to the value
 		else {
 			newCount = value;
-			this.numberOfChars = numberOfChars + newCount;
+			numberOfChars = numberOfChars + newCount;
 		}
 		// update the total count of the new char we just adjusted
 		// Add it to the inventory
@@ -166,10 +166,15 @@ public class LetterInventory {
 
 		// Look through the other inventory and merge the letters with the tempLetterInventory
 		for (Character ch : other.inventory.keySet()) {
+			// The occurences of this letter to be added to the tempArray
 			int newValue = other.inventory.get(ch);
+			// If the calling LetterInventory alread has this letter then get the current value and add the new value
 			if (tempLetterInventory.inventory.containsKey(ch)) {
-				int currentValue = this.inventory.get(ch);
-				tempLetterInventory.inventory.put(ch, currentValue + newValue);
+				// get the Value in the orignal LetterInventory
+				int currentValue = tempLetterInventory.inventory.get(ch);
+				// Add the total prior existing occurences to the new total
+				int totalOccurences = currentValue + newValue;
+				tempLetterInventory.inventory.put(ch, totalOccurences);
 				tempLetterInventory.numberOfChars = tempLetterInventory.numberOfChars + newValue;
 			}
 			else {
