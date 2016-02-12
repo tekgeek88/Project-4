@@ -3,10 +3,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class LetterInventory {
 
@@ -98,7 +100,7 @@ public class LetterInventory {
 		return "[" + result + "]";
 	}
 
-	
+
 	public void set(char letter, int value) throws IllegalArgumentException {
 		// Take the letter passed in and convert it to a lowerCase
 		letter = Character.toLowerCase(letter);
@@ -110,18 +112,18 @@ public class LetterInventory {
 			newCount = value;
 			// If increasing
 			if (value >= currentCount) {
-				this.numberOfChars = this.numberOfChars + value;
+				this.numberOfChars = numberOfChars + value;
 			}
 			//If decreasing count
 			else if (value < currentCount) {
 				int difference = currentCount - value;
-				this.numberOfChars = this.numberOfChars - difference;
+				this.numberOfChars = numberOfChars - difference;
 			}
 		}
 		// if this is the characters first time appearing make a new entry and set the newCount to the value
 		else {
 			newCount = value;
-			this.numberOfChars = this.numberOfChars + newCount;
+			this.numberOfChars = numberOfChars + newCount;
 		}
 		// update the total count of the new char we just adjusted
 		// Add it to the inventory
@@ -133,13 +135,13 @@ public class LetterInventory {
 			inventory.remove(letter);
 		}
 		// Then resort the collection
-		reorderSet();
+		inventory = sortInventory(inventory);
 	}
 
-	public void reorderSet() {
+	public LinkedHashMap<Character, Integer> sortInventory(LinkedHashMap<Character, Integer> unSortedMap) {
 		// Create a new List object of the current ordered list so that we can sort it.
 		List<Entry<Character, Integer>> entries;
-		entries = new ArrayList<Map.Entry<Character, Integer>>((Collection<? extends Entry<Character, Integer>>) inventory.entrySet());
+		entries = new ArrayList<Map.Entry<Character, Integer>>((Collection<? extends Entry<Character, Integer>>) unSortedMap.entrySet());
 		// call the sort method just as we did on the array and pass in the Map comparator to check the key values in the list
 		Collections.sort(entries, new Comparator<Map.Entry<Character, Integer>>() {
 			// Call the compare method from the List interface and create on object 'a' and object 'b' to compare the two entries to eachother
@@ -152,9 +154,35 @@ public class LetterInventory {
 		for (Entry<Character, Integer> entry : entries) {
 			sortedInventory.put(entry.getKey(), entry.getValue());
 		}
-		this.inventory = sortedInventory;
+		return sortedInventory;
+	}// End reorderSet()
 
+	public LetterInventory add(LetterInventory other) {
+		// Create a temporary LetterInventory we can  modify and return.
+		LetterInventory tempLetterInventory = new LetterInventory();
+		// Populate it with the fields of the currentLetterInventory
+		tempLetterInventory.inventory = this.inventory;
+		tempLetterInventory.numberOfChars = this.size();
+
+		// Look through the other inventory and merge the letters with the tempLetterInventory
+		for (Character ch : other.inventory.keySet()) {
+			int newValue = other.inventory.get(ch);
+			if (tempLetterInventory.inventory.containsKey(ch)) {
+				int currentValue = this.inventory.get(ch);
+				tempLetterInventory.inventory.put(ch, currentValue + newValue);
+				tempLetterInventory.numberOfChars = tempLetterInventory.numberOfChars + newValue;
+			}
+			else {
+				tempLetterInventory.inventory.put(ch, newValue);
+				tempLetterInventory.numberOfChars = tempLetterInventory.numberOfChars + newValue;
+			}
+		}
+		tempLetterInventory.inventory = this.sortInventory(tempLetterInventory.inventory);
+		return tempLetterInventory;
 	}
-
+	
+	public LetterInventory subtract(LetterInventory other) {
+		return null;
+	}
 
 }
