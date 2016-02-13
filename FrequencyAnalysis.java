@@ -9,9 +9,14 @@ import java.util.Scanner;
 import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
-
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.nio.Buffer;
 
 public class FrequencyAnalysis {
    /* Characters ordered from most to least frequently used */
@@ -27,7 +32,7 @@ public class FrequencyAnalysis {
      * assign a letter or not. */
     private static final double EASY_THRESHOLD = 0.01;
 
-    /* The number of runs of passes through the text on the dictionary the 
+    /* The number of runs ofq passes through the text on the dictionary the 
        analysis will perform. */
     private static final int NUMBER_DICTIONARY_RUNS = 10;
 
@@ -257,6 +262,27 @@ public class FrequencyAnalysis {
 
         /* See the result! */
         System.out.println(freq);
+        
+        /* Write the output to a text file */
+        PrintWriter printWriter = null;
+        File file = null;
+        
+        try {
+			file = new File("decodedCryptogram.txt");
+		} catch (NullPointerException e) {
+			System.out.println("File not found!");
+		}
+        
+		try {
+			printWriter = new PrintWriter(new FileWriter(file));
+		} catch (IOException e) {
+			System.out.println("Could not create file to write customer database to!");
+			return;
+		}
+		printWriter.write(freq.toString());
+		printWriter.flush();
+		printWriter.close();
+        
     }
 }
 

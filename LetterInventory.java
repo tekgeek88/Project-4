@@ -80,6 +80,9 @@ public class LetterInventory {
 	}
 
 	public void set(char letter, int value) throws IllegalArgumentException {
+		if(!Character.isAlphabetic(letter)) {
+			throw new IllegalArgumentException();
+		}
 		// Take the letter passed in and convert it to a lowerCase
 		letter = Character.toLowerCase(letter);
 		int currentCount = 0;
@@ -202,6 +205,17 @@ public class LetterInventory {
 		}
 		tempLetterInventory.inventory = this.sortInventory(tempLetterInventory.inventory);
 		return tempLetterInventory;
+	}
+
+	public double getLetterPercentage(char letter) throws IllegalArgumentException {
+		if (!Character.isAlphabetic(letter)) {
+			throw new IllegalArgumentException();
+		}
+		double letterOccurences = (double)(get(letter));
+		double totalChars = (double)size();
+		double occurenceRate = (letterOccurences/totalChars);
+		return occurenceRate;
+
 	}
 
 
