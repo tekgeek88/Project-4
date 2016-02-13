@@ -3,12 +3,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 public class LetterInventory {
 
@@ -18,6 +16,7 @@ public class LetterInventory {
 
 	// Default Constructor
 	public LetterInventory() {
+		inventory = new LinkedHashMap<Character, Integer>();
 	}
 
 	public LetterInventory(String data) {
@@ -54,11 +53,10 @@ public class LetterInventory {
 			charCounter++;
 		}// End of searching through all characters in the char array
 		// Update the total number of characters in the inventory
-		this.numberOfChars = charCounter;
+		numberOfChars = charCounter;
 		// Return a LinkedHashMap of Characters and  Integers
 		return tempHashMap;
 	}
-
 
 	public int size() {
 		return numberOfChars;
@@ -72,7 +70,7 @@ public class LetterInventory {
 		// Convert the character to a lowercase in order to search for the entry by Key
 		ch = Character.toLowerCase(ch);
 		// Check if key exists before trying to access it. if exists return the number of characters that key(letter) has.
-		if (this.inventory.containsKey(ch)) {
+		if (this.inventory.containsKey(ch) && this.inventory.get(ch) != null) {
 			return this.inventory.get(ch);
 		}
 		// If the key doesn't exist return zero
@@ -80,26 +78,6 @@ public class LetterInventory {
 			return 0;
 		}
 	}
-
-	@Override
-	public String toString() {
-		// Use the stringBuilder to create the desired output of each occurring character
-		StringBuilder sb = new StringBuilder();
-		String result = null;
-		for (Map.Entry<Character, Integer> entry : inventory.entrySet()) {
-			// For each character in the list list of characters
-			Character ch = entry.getKey();
-			Integer value = entry.getValue();
-			// For each time a character occurs print append the character to the string
-			for (int i = 0; i < value; i++) {
-				sb.append(ch);
-			}
-		}
-		// Convert the sb object to a string and then add the brackets on so it passes the test. 
-		result = sb.toString();
-		return "[" + result + "]";
-	}
-
 
 	public void set(char letter, int value) throws IllegalArgumentException {
 		// Take the letter passed in and convert it to a lowerCase
@@ -158,10 +136,10 @@ public class LetterInventory {
 	}// End reorderSet()
 
 	public LetterInventory add(LetterInventory other) {
-		// Create a temporary LetterInventory we can  modify and return.
+		// Create a temporary LetterInventory to modify and return.
 		LetterInventory tempLetterInventory = new LetterInventory();
-		// Populate it with the fields of the currentLetterInventory
-		tempLetterInventory.inventory = this.inventory;
+		// Populate the two fields of keys and total chars of the currentLetterInventory
+		tempLetterInventory.inventory.putAll(inventory);
 		tempLetterInventory.numberOfChars = this.size();
 
 		// Look through the other inventory and merge the letters with the tempLetterInventory
@@ -185,9 +163,68 @@ public class LetterInventory {
 		tempLetterInventory.inventory = this.sortInventory(tempLetterInventory.inventory);
 		return tempLetterInventory;
 	}
-	
+
 	public LetterInventory subtract(LetterInventory other) {
-		return null;
+		// Create a temporary LetterInventory to modify and return.
+		LetterInventory tempLetterInventory = new LetterInventory();
+		// Populate the two fields of keys and total chars of the currentLetterInventory
+		tempLetterInventory.inventory.putAll(inventory);
+		tempLetterInventory.numberOfChars = this.size();
+
+		// Look through the other inventory and merge the letters with the tempLetterInventory
+		for (Character ch : other.inventory.keySet()) {
+			// The occurences of this letter to be added to the tempArray
+			int amountToBeSubtracted = other.inventory.get(ch);
+			// If the calling LetterInventory already has this letter then get the current value and subtract the other's value
+			if (tempLetterInventory.inventory.containsKey(ch)) {
+				// get the Value in the orignal LetterInventory
+				int currentValue = tempLetterInventory.inventory.get(ch);
+				// Subtract the total from the prior existing occurences to the new total
+				int totalOccurences = currentValue - amountToBeSubtracted;
+				if (totalOccurences == 0) {
+					tempLetterInventory.inventory.remove(ch);
+					tempLetterInventory.numberOfChars = tempLetterInventory.numberOfChars - amountToBeSubtracted;
+				}
+				else if (totalOccurences < 0) {
+					tempLetterInventory = null;
+					return tempLetterInventory;
+				}
+				else {
+					tempLetterInventory.inventory.put(ch, totalOccurences);
+					tempLetterInventory.numberOfChars = tempLetterInventory.numberOfChars - amountToBeSubtracted;
+				}
+			}
+			// Inventory doesn't contain key being subtracted and would make a negative number so we return null
+			else {
+				tempLetterInventory = null;
+				return tempLetterInventory;
+			}
+		}
+		tempLetterInventory.inventory = this.sortInventory(tempLetterInventory.inventory);
+		return tempLetterInventory;
+	}
+
+
+
+	@Override
+	public String toString() {
+		// Use the stringBuilder to create the desired output of each occurring character
+		StringBuilder sb = new StringBuilder();
+		String result = null;
+		for (Map.Entry<Character, Integer> entry : inventory.entrySet()) {
+			// For each character in the list list of characters
+			Character ch = entry.getKey();
+			Integer value = entry.getValue();
+			// For each time a character occurs print append the character to the string
+			if (value != null) {
+				for (int i = 0; i < value; i++) {
+					sb.append(ch);
+				}
+			}
+		}
+		// Convert the sb object to a string and then add the brackets on so it passes the test. 
+		result = sb.toString();
+		return "[" + result + "]";
 	}
 
 }
